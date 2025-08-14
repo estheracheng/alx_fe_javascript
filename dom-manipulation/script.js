@@ -28,6 +28,7 @@ function populateCategories() {
   const lastFilter = localStorage.getItem("selectedCategory");
   if (lastFilter) categoryFilter.value = lastFilter;
 }
+
 function filterQuotes() {
   const selected = categoryFilter.value;
   localStorage.setItem("selectedCategory", selected);
@@ -73,7 +74,6 @@ addQuoteForm.addEventListener("submit", function(e) {
   populateCategories();
   filterQuotes();
 });
-
 exportBtn.addEventListener("click", function() {
   const blob = new Blob([JSON.stringify(quotes, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -85,7 +85,6 @@ exportBtn.addEventListener("click", function() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 });
-
 importFile.addEventListener("change", function(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -109,10 +108,9 @@ importFile.addEventListener("change", function(e) {
   };
   reader.readAsText(file);
 });
-
 const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
 
-async function fetchServerQuotes() {
+async function fetchQuotesFromServer() {
   try {
     const response = await fetch(SERVER_URL);
     const data = await response.json();
@@ -129,7 +127,7 @@ async function fetchServerQuotes() {
 }
 
 async function syncWithServer() {
-  const serverQuotes = await fetchServerQuotes();
+  const serverQuotes = await fetchQuotesFromServer(); 
   let newDataAdded = false;
 
   serverQuotes.forEach(serverQuote => {
