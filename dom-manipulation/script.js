@@ -13,6 +13,7 @@ const categoryInput = document.getElementById("categoryInput");
 const newQuoteBtn = document.getElementById("newQuoteBtn");
 const exportBtn = document.getElementById("exportBtn");
 const importFile = document.getElementById("importFile");
+const syncBtn = document.getElementById("syncBtn");
 
 function populateCategories() {
   const categories = ["all", ...new Set(quotes.map(q => q.category))];
@@ -43,9 +44,11 @@ function filterQuotes() {
   const randomQuote = filtered[Math.floor(Math.random() * filtered.length)];
   quoteDisplay.innerHTML = `"${randomQuote.text}" — ${randomQuote.author} [${randomQuote.category}]`;
 }
+
 function showRandomQuote() {
-  filterQuotes();
+  filterQuotes(); 
 }
+
 addQuoteForm.addEventListener("submit", function(e) {
   e.preventDefault();
 
@@ -70,6 +73,7 @@ addQuoteForm.addEventListener("submit", function(e) {
   populateCategories();
   filterQuotes();
 });
+
 exportBtn.addEventListener("click", function() {
   const blob = new Blob([JSON.stringify(quotes, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -81,6 +85,7 @@ exportBtn.addEventListener("click", function() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 });
+
 importFile.addEventListener("change", function(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -104,7 +109,53 @@ importFile.addEventListener("change", function(e) {
   };
   reader.readAsText(file);
 });
+
+const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
+
+async function fetchServerQuotes() {
+  try {
+    const response = await fetch(SERVER_URL);
+    const data = await response.json();
+    const serverQuotes = data.slice(0, 5).map(item => ({
+      text: item.title,
+      author: "Server User",
+      category: "Server"
+    }));
+    return serverQuotes;
+  } catch (error) {
+    console.error("Error fetching server quotes:", error);
+    return [];
+  }
+}
+
+async function syncWithServer() {
+  const serverQuotes = await fetchServerQuotes();
+  let newDataAdded = false;
+
+  serverQuotes.forEach(serverQuote => {
+    const exists = quotes.some(
+      q => q.text === serverQuote.text && q.author === serverQuote.author
+    );
+    if (!exists) {
+      quotes.push(serverQuote);
+      newDataAdded = true;
+    }
+  });
+
+  if (newDataAdded) {
+    localStorage.setItem("quotes", JSON.stringify(quotes));
+    populateCategories();
+    filterQuotes();
+    alert("Quotes synced with server! New quotes were added.");
+  }
+}
+
+setInterval(syncWithServer, 30000);
+
+syncBtn.addEventListener("click", syncWithServer);
+
 categoryFilter.addEventListener("change", filterQuotes);
 newQuoteBtn.addEventListener("click", showRandomQuote);
+
 populateCategories();
 filterQuotes();
