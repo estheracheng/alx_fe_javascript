@@ -147,4 +147,33 @@ async function fetchQuotesFromServer() {
 }
 
 async function syncWithServer() {
-  co
+  const serverQuotes = await fetchQuotesFromServer();
+  let newDataAdded = false;
+
+  serverQuotes.forEach(serverQuote => {
+    const exists = quotes.some(
+      q => q.text === serverQuote.text && q.author === serverQuote.author
+    );
+    if (!exists) {
+      quotes.push(serverQuote);
+      newDataAdded = true;
+    }
+  });
+
+  if (newDataAdded) {
+    localStorage.setItem("quotes", JSON.stringify(quotes));
+    populateCategories();
+    filterQuotes();
+    alert("Quotes synced with server! New quotes were added.");
+  }
+}
+
+setInterval(syncWithServer, 30000);
+
+syncBtn.addEventListener("click", syncWithServer);
+
+categoryFilter.addEventListener("change", filterQuotes);
+newQuoteBtn.addEventListener("click", showRandomQuote);
+
+populateCategories();
+filterQuotes();
