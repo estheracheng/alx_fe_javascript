@@ -6,8 +6,28 @@ let quotes = [
 function showRandomQuote() {
   let randomIndex = Math.floor(Math.random() * quotes.length);
   let randomQuote = quotes[randomIndex];
+
   let displayArea = document.getElementById("quoteDisplay");
   displayArea.innerHTML = `"${randomQuote.text}" <br><em>— ${randomQuote.category}</em>`;
+}
+function createAddQuoteForm() {
+  let formContainer = document.createElement("div");
+  formContainer.style.marginTop = "20px";
+  let quoteInput = document.createElement("input");
+  quoteInput.id = "newQuoteText";
+  quoteInput.type = "text";
+  quoteInput.placeholder = "Enter a new quote";
+  let categoryInput = document.createElement("input");
+  categoryInput.id = "newQuoteCategory";
+  categoryInput.type = "text";
+  categoryInput.placeholder = "Enter quote category";
+  let addButton = document.createElement("button");
+  addButton.textContent = "Add Quote";
+  addButton.addEventListener("click", addQuote);
+  formContainer.appendChild(quoteInput);
+  formContainer.appendChild(categoryInput);
+  formContainer.appendChild(addButton);
+  document.body.appendChild(formContainer);
 }
 function addQuote() {
   let quoteText = document.getElementById("newQuoteText").value.trim();
@@ -17,7 +37,9 @@ function addQuote() {
     alert("Please enter both a quote and a category!");
     return;
   }
+
   quotes.push({ text: quoteText, category: quoteCategory });
+
   document.getElementById("newQuoteText").value = "";
   document.getElementById("newQuoteCategory").value = "";
 
@@ -25,3 +47,4 @@ function addQuote() {
 }
 document.getElementById("newQuote").addEventListener("click", showRandomQuote);
 showRandomQuote();
+createAddQuoteForm();
