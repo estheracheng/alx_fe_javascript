@@ -50,6 +50,22 @@ function showRandomQuote() {
   filterQuotes(); 
 }
 
+const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
+
+async function postQuoteToServer(quote) {
+  try {
+    const response = await fetch(SERVER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(quote)
+    });
+    const data = await response.json();
+    console.log("Quote posted to server:", data);
+  } catch (error) {
+    console.error("Error posting quote to server:", error);
+  }
+}
+
 addQuoteForm.addEventListener("submit", function(e) {
   e.preventDefault();
 
@@ -73,7 +89,11 @@ addQuoteForm.addEventListener("submit", function(e) {
 
   populateCategories();
   filterQuotes();
+
+  // Post to server simulation
+  postQuoteToServer(newQuote);
 });
+
 exportBtn.addEventListener("click", function() {
   const blob = new Blob([JSON.stringify(quotes, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -85,6 +105,7 @@ exportBtn.addEventListener("click", function() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 });
+
 importFile.addEventListener("change", function(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -108,7 +129,6 @@ importFile.addEventListener("change", function(e) {
   };
   reader.readAsText(file);
 });
-const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
 
 async function fetchQuotesFromServer() {
   try {
@@ -127,33 +147,4 @@ async function fetchQuotesFromServer() {
 }
 
 async function syncWithServer() {
-  const serverQuotes = await fetchQuotesFromServer(); 
-  let newDataAdded = false;
-
-  serverQuotes.forEach(serverQuote => {
-    const exists = quotes.some(
-      q => q.text === serverQuote.text && q.author === serverQuote.author
-    );
-    if (!exists) {
-      quotes.push(serverQuote);
-      newDataAdded = true;
-    }
-  });
-
-  if (newDataAdded) {
-    localStorage.setItem("quotes", JSON.stringify(quotes));
-    populateCategories();
-    filterQuotes();
-    alert("Quotes synced with server! New quotes were added.");
-  }
-}
-
-setInterval(syncWithServer, 30000);
-
-syncBtn.addEventListener("click", syncWithServer);
-
-categoryFilter.addEventListener("change", filterQuotes);
-newQuoteBtn.addEventListener("click", showRandomQuote);
-
-populateCategories();
-filterQuotes();
+  co
