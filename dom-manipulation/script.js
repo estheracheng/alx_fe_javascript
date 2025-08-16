@@ -46,8 +46,9 @@ function filterQuotes() {
   quoteDisplay.innerHTML = `"${randomQuote.text}" — ${randomQuote.author} [${randomQuote.category}]`;
 }
 
+// ====== Show Random Quote ======
 function showRandomQuote() {
-  filterQuotes(); 
+  filterQuotes();
 }
 
 const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
@@ -90,7 +91,6 @@ addQuoteForm.addEventListener("submit", function(e) {
   populateCategories();
   filterQuotes();
 
-  // Post to server simulation
   postQuoteToServer(newQuote);
 });
 
@@ -146,7 +146,7 @@ async function fetchQuotesFromServer() {
   }
 }
 
-async function syncWithServer() {
+async function syncQuotes() {
   const serverQuotes = await fetchQuotesFromServer();
   let newDataAdded = false;
 
@@ -168,9 +168,9 @@ async function syncWithServer() {
   }
 }
 
-setInterval(syncWithServer, 30000);
+setInterval(syncQuotes, 30000);
 
-syncBtn.addEventListener("click", syncWithServer);
+syncBtn.addEventListener("click", syncQuotes);
 
 categoryFilter.addEventListener("change", filterQuotes);
 newQuoteBtn.addEventListener("click", showRandomQuote);
